@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Entry Payload</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: system-ui, sans-serif; background:#020617; color:#e5e7eb; margin:0; padding:16px; }
+    .wrap { max-width:720px; margin:0 auto; }
+    h1 { font-size:20px; margin-bottom:12px; }
+    label { display:block; font-size:13px; margin:8px 0 4px; color:#9ca3af; }
+    textarea, input { width:100%; padding:8px; border-radius:8px; border:1px solid #111827; background:#020617; color:#e5e7eb; font-family:inherit; font-size:13px; box-sizing:border-box; }
+    button { margin-top:12px; padding:8px 14px; border-radius:8px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:14px; cursor:pointer; }
+    button:active { transform:scale(.98); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; font-size:12px; white-space:pre-wrap; word-break:break-all; margin-top:8px; }
+    a { color:#38bdf8; font-size:13px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Index → Payload → Google (real-time)</h1>
+
+  <label>Query untuk Google (param <code>q</code>)</label>
+  <input id="qInput" placeholder="misal: anime ku">
+
+  <label>Payload mentah (akan di-base64, masuk ke HASH / fragment)</label>
+  <textarea id="payloadInput" rows="4" placeholder="[ user iPhone 16 pro max&#10;en-EN&#10;id-ID ]"></textarea>
+
+  <button id="goBtn">GO (encode → /payload/payload.html → Google)</button>
+
+  <div class="mono" id="preview"></div>
+
+  <p style="margin-top:18px;">
+    <a href="./viewer/viewer.html" target="_blank">Buka viewer payload (lihat localStorage)</a>
+  </p>
+</div>
+
+<script>
+(function() {
+  const qInput = document.getElementById("qInput");
+  const payloadInput = document.getElementById("payloadInput");
+  const goBtn = document.getElementById("goBtn");
+  const preview = document.getElementById("preview");
+
+  function buildUrl() {
+    const q = qInput.value || "";
+    const raw = payloadInput.value || "";
+    let b64 = "";
+    try {
+      b64 = raw ? btoa(raw) : "";
+    } catch (e) {
+      b64 = "";
+    }
+    const base = location.origin + "/payload/payload.html";
+    const url = base + "?q=" + encodeURIComponent(q) + (b64 ? "#" + b64 : "");
+    return { url, b64 };
+  }
+
+  function updatePreview() {
+    const { url, b64 } = buildUrl();
+    preview.textContent =
+      "Base64:\n" + (b64 || "(kosong)") +
+      "\n\nFull URL:\n" + url;
+  }
+
+  qInput.addEventListener("input", updatePreview);
+  payloadInput.addEventListener("input", updatePreview);
+
+  goBtn.addEventListener("click", function() {
+    const { url } = buildUrl();
+    if (!url) return;
+    // real redirect
+    location.href = url;
+  });
+
+  updatePreview();
+})();
+</script>
+</body>
+</html>
