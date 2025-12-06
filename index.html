@@ -1,42 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>payload boot</title>
+  <title>Index → Payload</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script>
-  (function() {
-    // ambil query & hash
-    const params = new URLSearchParams(location.search);
-    const q = params.get("q") || "";
-    const rawHash = location.hash ? location.hash.slice(1) : "";
-
-    // decode base64
-    let decoded = "";
-    if (rawHash) {
-      try {
-        decoded = atob(rawHash);
-      } catch (e) {
-        decoded = "(decode base64 gagal)";
-      }
-    }
-
-    // simpan ke localStorage + sessionStorage
-    try {
-      if (decoded || rawHash) {
-        const val = decoded || rawHash;
-        localStorage.setItem("payload_hash", val);
-        sessionStorage.setItem("payload_hash", val);
-      }
-    } catch (e) {
-      // mode private / storage off => cuek
-    }
-
-    // redirect ke Google (q bisa kosong, tetep valid)
-    const target = "https://www.google.com/search?q=" + encodeURIComponent(q);
-    location.replace(target);
-  })();
-  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#020617; color:#e5e7eb; margin:0; padding:16px; }
+    .wrap { max-width:720px; margin:0 auto; }
+    h1 { font-size:20px; margin-bottom:12px; }
+    label { display:block; font-size:13px; margin:8px 0 4px; color:#9ca3af; }
+    input { width:100%; padding:8px; border-radius:8px; border:1px solid #111827; background:#020617; color:#e5e7eb; font-family:inherit; font-size:13px; box-sizing:border-box; }
+    button { margin-top:12px; padding:8px 14px; border-radius:8px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:14px; cursor:pointer; }
+    button:active { transform:scale(.98); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; font-size:12px; white-space:pre-wrap; word-break:break-all; margin-top:8px; }
+    a { color:#38bdf8; font-size:13px; }
+  </style>
 </head>
-<body></body>
+<body>
+<div class="wrap">
+  <h1>Index → Payload → 172.217.194.139/search</h1>
+
+  <label>Kata kunci (Google search)</label>
+  <input id="qInput" placeholder="misal: anime ku">
+
+  <button id="goBtn">GO</button>
+
+  <div class="mono" id="preview"></div>
+
+  <p style="margin-top:18px;">
+    <a href="./viewer/viewer.html" target="_blank">Buka viewer payload (localStorage)</a>
+  </p>
+</div>
+
+<script>
+(function() {
+  const qInput = document.getElementById("qInput");
+  const goBtn = document.getElementById("goBtn");
+  const preview = document.getElementById("preview");
+
+  function buildUrl() {
+    const q = qInput.value || "";
+    const base = location.origin + "/payload/payload.html";
+    const url = base + "?q=" + encodeURIComponent(q);
+    return { url, q };
+  }
+
+  function updatePreview() {
+    const { url, q } = buildUrl();
+    preview.textContent =
+      "Query:\n" + (q || "(kosong)") +
+      "\n\nNext URL (ke payload.html):\n" + url;
+  }
+
+  qInput.addEventListener("input", updatePreview);
+
+  goBtn.addEventListener("click", function() {
+    const { url } = buildUrl();
+    if (!url) return;
+    location.href = url; // real redirect ke /payload/payload.html
+  });
+
+  updatePreview();
+})();
+</script>
+</body>
 </html>
