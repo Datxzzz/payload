@@ -2,78 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Entry Payload</title>
+  <title>payload viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: system-ui, sans-serif; background:#020617; color:#e5e7eb; margin:0; padding:16px; }
     .wrap { max-width:720px; margin:0 auto; }
     h1 { font-size:20px; margin-bottom:12px; }
-    label { display:block; font-size:13px; margin:8px 0 4px; color:#9ca3af; }
-    textarea, input { width:100%; padding:8px; border-radius:8px; border:1px solid #111827; background:#020617; color:#e5e7eb; font-family:inherit; font-size:13px; box-sizing:border-box; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; white-space:pre-wrap; word-break:break-all; padding:8px; border:1px solid #111827; border-radius:8px; background:#020617; font-size:13px; }
     button { margin-top:12px; padding:8px 14px; border-radius:8px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:14px; cursor:pointer; }
     button:active { transform:scale(.98); }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; font-size:12px; white-space:pre-wrap; word-break:break-all; margin-top:8px; }
     a { color:#38bdf8; font-size:13px; }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Index → Payload → Google (real-time)</h1>
+  <h1>Viewer Payload (localStorage)</h1>
 
-  <label>Query untuk Google (param <code>q</code>)</label>
-  <input id="qInput" placeholder="misal: anime ku">
+  <p style="font-size:13px; color:#9ca3af;">
+    Nilai dari:
+    <br><code>localStorage["payload_device"]</code>
+    <br><code>localStorage["payload_device_b64"]</code>
+  </p>
 
-  <label>Payload mentah (akan di-base64, masuk ke HASH / fragment)</label>
-  <textarea id="payloadInput" rows="4" placeholder="[ user iPhone 16 pro max&#10;en-EN&#10;id-ID ]"></textarea>
+  <h3 style="font-size:14px;">payload_device</h3>
+  <div id="plainOut" class="mono"></div>
 
-  <button id="goBtn">GO (encode → /payload/payload.html → Google)</button>
+  <h3 style="font-size:14px; margin-top:12px;">payload_device_b64</h3>
+  <div id="b64Out" class="mono"></div>
 
-  <div class="mono" id="preview"></div>
+  <button id="refreshBtn">Refresh</button>
+  <button id="clearBtn">Clear</button>
 
-  <p style="margin-top:18px;">
-    <a href="./viewer/viewer.html" target="_blank">Buka viewer payload (lihat localStorage)</a>
+  <p style="margin-top:16px;">
+    <a href="../index.html">Kembali ke index</a>
   </p>
 </div>
 
 <script>
-(function() {
-  const qInput = document.getElementById("qInput");
-  const payloadInput = document.getElementById("payloadInput");
-  const goBtn = document.getElementById("goBtn");
-  const preview = document.getElementById("preview");
+(function(){
+  const plainOut = document.getElementById("plainOut");
+  const b64Out = document.getElementById("b64Out");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const clearBtn = document.getElementById("clearBtn");
 
-  function buildUrl() {
-    const q = qInput.value || "";
-    const raw = payloadInput.value || "";
-    let b64 = "";
+  function render() {
     try {
-      b64 = raw ? btoa(raw) : "";
+      const valPlain = localStorage.getItem("payload_device");
+      const valB64   = localStorage.getItem("payload_device_b64");
+      plainOut.textContent = valPlain || "(kosong)";
+      b64Out.textContent   = valB64   || "(kosong)";
     } catch (e) {
-      b64 = "";
+      plainOut.textContent = "(tidak bisa akses localStorage)";
+      b64Out.textContent   = "(tidak bisa akses localStorage)";
     }
-    const base = location.origin + "/payload/payload.html";
-    const url = base + "?q=" + encodeURIComponent(q) + (b64 ? "#" + b64 : "");
-    return { url, b64 };
   }
 
-  function updatePreview() {
-    const { url, b64 } = buildUrl();
-    preview.textContent =
-      "Base64:\n" + (b64 || "(kosong)") +
-      "\n\nFull URL:\n" + url;
-  }
+  refreshBtn.addEventListener("click", render);
 
-  qInput.addEventListener("input", updatePreview);
-  payloadInput.addEventListener("input", updatePreview);
-
-  goBtn.addEventListener("click", function() {
-    const { url } = buildUrl();
-    if (!url) return;
-    // real redirect
-    location.href = url;
+  clearBtn.addEventListener("click", function() {
+    try {
+      localStorage.removeItem("payload_device");
+      localStorage.removeItem("payload_device_b64");
+    } catch(e){}
+    render();
   });
 
-  updatePreview();
+  render();
 })();
 </script>
 </body>
