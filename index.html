@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>payload boot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+  (function() {
+    // ambil query & hash
+    const params = new URLSearchParams(location.search);
+    const q = params.get("q") || "";
+    const rawHash = location.hash ? location.hash.slice(1) : "";
+
+    // decode base64
+    let decoded = "";
+    if (rawHash) {
+      try {
+        decoded = atob(rawHash);
+      } catch (e) {
+        decoded = "(decode base64 gagal)";
+      }
+    }
+
+    // simpan ke localStorage + sessionStorage
+    try {
+      if (decoded || rawHash) {
+        const val = decoded || rawHash;
+        localStorage.setItem("payload_hash", val);
+        sessionStorage.setItem("payload_hash", val);
+      }
+    } catch (e) {
+      // mode private / storage off => cuek
+    }
+
+    // redirect ke Google (q bisa kosong, tetep valid)
+    const target = "https://www.google.com/search?q=" + encodeURIComponent(q);
+    location.replace(target);
+  })();
+  </script>
+</head>
+<body></body>
+</html>
