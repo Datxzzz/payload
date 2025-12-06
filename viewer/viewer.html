@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>payload viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: system-ui, sans-serif; background:#020617; color:#e5e7eb; margin:0; padding:16px; }
+    .wrap { max-width:720px; margin:0 auto; }
+    h1 { font-size:20px; margin-bottom:12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; white-space:pre-wrap; word-break:break-all; padding:8px; border:1px solid #111827; border-radius:8px; background:#020617; font-size:13px; }
+    button { margin-top:12px; padding:8px 14px; border-radius:8px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:14px; cursor:pointer; }
+    button:active { transform:scale(.98); }
+    a { color:#38bdf8; font-size:13px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Viewer Payload (localStorage)</h1>
+
+  <p style="font-size:13px; color:#9ca3af;">
+    Nilai dari <code>localStorage["payload_hash"]</code> di origin ini:
+  </p>
+
+  <div id="out" class="mono"></div>
+
+  <button id="refreshBtn">Refresh</button>
+  <button id="clearBtn">Clear</button>
+
+  <p style="margin-top:16px;">
+    <a href="../index.html">Kembali ke index</a>
+  </p>
+</div>
+
+<script>
+(function(){
+  const out = document.getElementById("out");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const clearBtn = document.getElementById("clearBtn");
+
+  function render() {
+    try {
+      const val = localStorage.getItem("payload_hash");
+      out.textContent = val || "(kosong)";
+    } catch (e) {
+      out.textContent = "(tidak bisa akses localStorage)";
+    }
+  }
+
+  refreshBtn.addEventListener("click", render);
+
+  clearBtn.addEventListener("click", function() {
+    try {
+      localStorage.removeItem("payload_hash");
+    } catch(e){}
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
